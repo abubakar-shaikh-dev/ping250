@@ -11,7 +11,7 @@ import type { Attachment } from "@/lib/smtp/schema";
 import { useRef } from "react";
 import { CopyButton } from "./copy-button";
 import { Panel } from "./panel";
-import { Turnstile } from "./turnstile";
+import { Turnstile, type TurnstileHandle } from "./turnstile";
 
 export interface ComposeDraft {
   to: string;
@@ -36,6 +36,7 @@ interface ComposePanelProps {
   onSend: () => void;
   onAttachmentFile: (file: File | null) => void;
   onTurnstileToken: (token: string | null) => void;
+  turnstileHandleRef?: React.RefObject<TurnstileHandle | null>;
 }
 
 export function ComposePanel({
@@ -49,6 +50,7 @@ export function ComposePanel({
   onSend,
   onAttachmentFile,
   onTurnstileToken,
+  turnstileHandleRef,
 }: ComposePanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -158,7 +160,7 @@ export function ComposePanel({
           )}
         </div>
 
-        <Turnstile onVerify={onTurnstileToken} />
+        <Turnstile onVerify={onTurnstileToken} handleRef={turnstileHandleRef} />
 
         <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row">
           <StatefulButton

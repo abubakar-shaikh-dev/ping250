@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js";
 const ENABLED = process.env.NEXT_PUBLIC_TURNSTILE_ENABLED === "true";
@@ -33,9 +33,14 @@ function loadTurnstileScript(): Promise<void> {
   return scriptPromise;
 }
 
+export interface TurnstileHandle {
+  reset: () => void;
+}
+
 interface TurnstileProps {
   onVerify: (token: string | null) => void;
   onExpire?: () => void;
+  handleRef?: React.RefObject<TurnstileHandle | null>;
 }
 
 /**
@@ -43,13 +48,31 @@ interface TurnstileProps {
  * rendered exactly once; parent re-renders never tear it down. When the check
  * is disabled (local dev) it renders nothing and reports a null token.
  */
-export function Turnstile({ onVerify, onExpire }: TurnstileProps) {
+export function Turnstile({ onVerify, onExpire, handleRef }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const onVerifyRef = useRef(onVerify);
   const onExpireRef = useRef(onExpire);
   onVerifyRef.current = onVerify;
   onExpireRef.current = onExpire;
+
+  const reset = useCallback(() => {
+    if (widgetId.current && window.turnstile) {
+      window.turnstile.reset(widgetId.current);
+    }
+    onVerifyRef.current(null);
+  }, []);
+
+  useEffect(() => {
+    if (handleRef) {
+      handleRef.current = { reset };
+    }
+    return () => {
+      if (handleRef) {
+        handleRef.current = null;
+      }
+    };
+  }, [handleRef, reset]);
 
   useEffect(() => {
     if (!ENABLED) {

@@ -23,6 +23,7 @@ import type {
   VerifyResult,
 } from "@/types/smtp";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Turnstile, type TurnstileHandle } from "./turnstile";
 import { ConnectionPanel } from "./connection-panel";
 import { ComposePanel, type ComposeDraft } from "./compose-panel";
 import { DiagnosticsPanel } from "./diagnostics-panel";
@@ -64,6 +65,7 @@ export function SmtpConsole({ initialConfig }: SmtpConsoleProps) {
   const [log, setLog] = useState<LogLine[]>([]);
   const [result, setResult] = useState<SmtpActionResult | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
 
   // Diagnostics + history
   const [diagDomain, setDiagDomain] = useState(() => domainOf(initialConfig.fromEmail));
@@ -153,6 +155,7 @@ export function SmtpConsole({ initialConfig }: SmtpConsoleProps) {
     addLog("cmd", `verify ${config.host || "<host>"}:${config.port} (secure=${config.secure})`);
     try {
       const res = await apiPost<VerifyResult>("/api/smtp/verify", { config, turnstileToken });
+      turnstileRef.current?.reset();
       setResult(res);
       if (res.ok) {
         flash(setVerifyState, "success");
@@ -172,6 +175,7 @@ export function SmtpConsole({ initialConfig }: SmtpConsoleProps) {
         errorTitle: res.error?.title,
       });
     } catch (error) {
+      turnstileRef.current?.reset();
       flash(setVerifyState, "error");
       if (error instanceof ApiError) describeFailure(error);
       else addLog("err", "Unexpected error during verify.");
@@ -201,6 +205,7 @@ export function SmtpConsole({ initialConfig }: SmtpConsoleProps) {
     };
     try {
       const res = await apiPost<SendResult>("/api/smtp/send", { config, message, turnstileToken });
+      turnstileRef.current?.reset();
       setResult(res);
       if (res.ok) {
         flash(setSendState, "success");
@@ -223,6 +228,7 @@ export function SmtpConsole({ initialConfig }: SmtpConsoleProps) {
         errorTitle: res.error?.title,
       });
     } catch (error) {
+      turnstileRef.current?.reset();
       flash(setSendState, "error");
       if (error instanceof ApiError) describeFailure(error);
       else addLog("err", "Unexpected error during send.");
@@ -241,10 +247,12 @@ export function SmtpConsole({ initialConfig }: SmtpConsoleProps) {
         domain: diagDomain.trim(),
         turnstileToken,
       });
+      turnstileRef.current?.reset();
       setReport(res.report);
       flash(setDiagState, "success");
       addLog("ok", `diagnostics complete for ${res.report.domain}`);
     } catch (error) {
+      turnstileRef.current?.reset();
       flash(setDiagState, "error");
       if (error instanceof ApiError) describeFailure(error);
       else addLog("err", "Diagnostics lookup failed.");
@@ -400,6 +408,7 @@ export function SmtpConsole({ initialConfig }: SmtpConsoleProps) {
           onSend={handleSend}
           onAttachmentFile={handleAttachmentFile}
           onTurnstileToken={setTurnstileToken}
+          turnstileHandleRef={turnstileRef}
         />
       </div>
 
