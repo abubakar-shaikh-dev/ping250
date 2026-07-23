@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (next-themes toggles `.dark` on <html>). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Design tokens — the "250 OK" system.
+  The accent is terminal phosphor green, the colour of an SMTP `250` success
+  reply. On the dark instrument theme it glows; on the light "paper" theme it
+  is darkened to keep AA contrast as text/accent. Every beUI component reads
+  the shadcn-style utility classes (bg-primary, text-muted-foreground, …) which
+  the `@theme inline` block below maps onto these raw tokens.
+*/
+:root {
+  --radius: 0.5rem;
+
+  --background: hsl(210 25% 99%);
+  --foreground: hsl(222 25% 10%);
+
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222 25% 10%);
+
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(222 25% 10%);
+
+  --primary: hsl(158 84% 26%);
+  --primary-foreground: hsl(150 100% 97%);
+
+  --secondary: hsl(210 18% 94%);
+  --secondary-foreground: hsl(222 20% 16%);
+
+  --muted: hsl(210 16% 93%);
+  --muted-foreground: hsl(220 12% 42%);
+
+  --accent: hsl(158 55% 92%);
+  --accent-foreground: hsl(158 84% 20%);
+
+  --destructive: hsl(0 72% 45%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --border: hsl(214 18% 88%);
+  --input: hsl(214 18% 82%);
+  --ring: hsl(158 84% 32%);
+
+  --font-geist-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-geist-mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+}
+
+.dark {
+  --background: hsl(222 24% 5%);
+  --foreground: hsl(150 22% 92%);
+
+  --card: hsl(222 20% 8%);
+  --card-foreground: hsl(150 22% 92%);
+
+  --popover: hsl(222 20% 8%);
+  --popover-foreground: hsl(150 22% 92%);
+
+  --primary: hsl(151 88% 52%);
+  --primary-foreground: hsl(222 30% 8%);
+
+  --secondary: hsl(222 16% 14%);
+  --secondary-foreground: hsl(150 15% 88%);
+
+  --muted: hsl(222 16% 13%);
+  --muted-foreground: hsl(200 12% 62%);
+
+  --accent: hsl(151 40% 16%);
+  --accent-foreground: hsl(151 88% 72%);
+
+  --destructive: hsl(0 78% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --border: hsl(220 16% 16%);
+  --input: hsl(220 16% 20%);
+  --ring: hsl(151 88% 52%);
+}
+
+/* Map the raw tokens onto Tailwind's colour/radius/font namespaces so utilities
+   like bg-primary, text-muted-foreground, border-border, rounded-lg resolve.
+   `inline` makes utilities reference the raw var directly (no intermediate
+   --color-* variable is emitted), so custom CSS below uses the raw tokens. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-geist-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--primary) 28%, transparent);
+  }
+
+  :focus-visible {
+    outline-color: color-mix(in oklab, var(--ring) 60%, transparent);
+  }
+}
+
+/* Console backdrop: a faint telemetry grid + phosphor glow on the dark theme.
+   Kept subtle so it reads as an instrument, not decoration. */
+@layer utilities {
+  .console-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .phosphor-glow {
+    text-shadow: 0 0 12px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+  .scrollbar-slim {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--muted-foreground) 40%, transparent) transparent;
+  }
+  .scrollbar-slim::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--muted-foreground) 35%, transparent);
+    border-radius: 9999px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
