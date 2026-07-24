@@ -1,7 +1,7 @@
 <div align="center">
 
 # Ping250 - **Send a test. Get a 250.**
-<img width="1774" height="887" alt="ChatGPT Image Jul 24, 2026, 11_53_34 AM" src="https://github.com/user-attachments/assets/c3e6aec3-a550-464c-a9ad-667b348d3755" />
+<img width="1774" height="887" alt="ChatGPT Image Jul 24, 2026, 12_07_57 PM" src="https://github.com/user-attachments/assets/bc59487b-20e4-40a2-b89c-b337a4882e40" />
 
 Verify SMTP credentials and send a real test message with Nodemailer — and get the exact reason it failed when it doesn't.
 
