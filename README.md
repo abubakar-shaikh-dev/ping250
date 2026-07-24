@@ -1,6 +1,7 @@
 <div align="center">
 
 # Ping250
+<img width="1774" height="887" alt="ChatGPT Image Jul 24, 2026, 11_53_34 AM" src="https://github.com/user-attachments/assets/c3e6aec3-a550-464c-a9ad-667b348d3755" />
 
 **Send a test. Get a 250.**
 
